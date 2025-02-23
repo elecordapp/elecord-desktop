@@ -11,7 +11,7 @@ import riotDesktopPackageJson from "../package.json";
 import { setPackageVersion } from "./set-version.js";
 
 const PUB_KEY_URL = "https://packages.riot.im/element-release-key.asc";
-const PACKAGE_URL_PREFIX = "https://github.com/element-hq/element-web/releases/download/";
+const PACKAGE_URL_PREFIX = "https://github.com/elecordapp/elecord-web/releases/download/";
 const DEVELOP_TGZ_URL = "https://develop.element.io/develop.tar.gz";
 const ASAR_PATH = "webapp.asar";
 
@@ -97,7 +97,8 @@ async function main(): Promise<number | undefined> {
         url = targetVersion;
         verify = false; // manually verified
     } else {
-        filename = `element-${targetVersion}.tar.gz`;
+        // filename = `element-${targetVersion}.tar.gz`;
+        filename = `elecord.tar.gz`;
         url = PACKAGE_URL_PREFIX + targetVersion + "/" + filename;
     }
 
