@@ -1,15 +1,15 @@
 {
-    "name": "element-desktop",
-    "productName": "Element",
+    "name": "elecord-desktop",
+    "productName": "elecord",
     "main": "lib/electron-main.js",
     "exports": "./lib/electron-main.js",
-    "version": "1.11.92",
-    "description": "A feature-rich client for Matrix.org",
-    "author": "Element",
-    "homepage": "https://element.io",
+    "version": "2.1.0",
+    "description": "Electron wrapper for elecord-web",
+    "author": "hazzuk",
+    "homepage": "https://elecord.app",
     "repository": {
         "type": "git",
-        "url": "https://github.com/vector-im/element-desktop"
+        "url": "https://github.com/elecordapp/elecord-desktop"
     },
     "license": "SEE LICENSE IN README.md",
     "type": "module",
