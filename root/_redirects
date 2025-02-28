@@ -2,3 +2,5 @@
 /desktop/update/win32/x64/RELEASES /desktop/update/win32/x64/RELEASES.txt
 /desktop/install/win32/x64/elecord%20Setup%202.1.0.exe https://github.com/elecordapp/elecord-desktop/releases/download/v2.1.0/elecord.Setup.2.1.0.exe
 /desktop/update/win32/x64/elecord-desktop-2.1.0-full.nupkg https://github.com/elecordapp/elecord-desktop/releases/download/v2.1.0/elecord-desktop-2.1.0-full.nupkg
+/desktop/install/win32/x64/elecord%20Setup%202.1.0.exe https://github.com/elecordapp/elecord-desktop/releases/download/v2.1.0/elecord.Setup.2.1.0.exe
+/desktop/update/win32/x64/elecord-desktop-2.1.0-full.nupkg https://github.com/elecordapp/elecord-desktop/releases/download/v2.1.0/elecord-desktop-2.1.0-full.nupkg
