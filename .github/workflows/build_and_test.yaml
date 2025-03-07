@@ -2,7 +2,7 @@ name: Build elecord-desktop
 on:
     # pull_request: {}
     push:
-        branches: [release]
+        branches: [release, testing]
     workflow_dispatch: {}
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
