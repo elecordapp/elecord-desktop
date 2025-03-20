@@ -23,25 +23,23 @@ jobs:
         uses: ./.github/workflows/build_windows.yaml
         strategy:
             matrix:
-                # arch: [x64, ia32]
+                # arch: [x64, ia32, arm64]
                 arch: [x64]
         with:
             arch: ${{ matrix.arch }}
 
-    # linux:
-    #     needs: fetch
-    #     name: "Linux (${{ matrix.arch }}) (sqlcipher: ${{ matrix.sqlcipher }})"
-    #     uses: ./.github/workflows/build_linux.yaml
-    #     strategy:
-    #         matrix:
-    #             # sqlcipher: [system, static]
-    #             sqlcipher: [static]
-    #             # arch: [amd64, arm64]
-    #             arch: [amd64]
-    #     with:
-    #         config: ${{ github.event.pull_request.base.ref == 'develop' && 'elecord.app/nightly' || 'elecord.app/release' }}
-    #         sqlcipher: ${{ matrix.sqlcipher }}
-    #         arch: ${{ matrix.arch }}
+    linux:
+        needs: fetch
+        name: "Linux (${{ matrix.arch }}) (sqlcipher: ${{ matrix.sqlcipher }})"
+        uses: ./.github/workflows/build_linux.yaml
+        strategy:
+            matrix:
+                # sqlcipher: [system, static]
+                sqlcipher: [static]
+                arch: [amd64, arm64]
+        with:
+            sqlcipher: ${{ matrix.sqlcipher }}
+            arch: ${{ matrix.arch }}
 
     # macos:
     #     needs: fetch
