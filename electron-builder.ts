@@ -20,8 +20,8 @@ import { readFile, writeFile } from "node:fs/promises";
  *  Passes $ED_DEBIAN_CHANGELOG to build.deb.fpm if specified
  */
 
-const NIGHTLY_APP_ID = "im.riot.nightly";
-const NIGHTLY_DEB_NAME = "element-nightly";
+const NIGHTLY_APP_ID = "app.elecord.nightly";
+const NIGHTLY_DEB_NAME = "elecord-nightly";
 
 interface Pkg {
     name: string;
@@ -74,7 +74,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
     // Make all fuses required to ensure they are all explicitly specified
     electronFuses: Required<Configuration["electronFuses"]>;
 } = {
-    appId: "im.riot.app",
+    appId: "app.elecord.desktop",
     asarUnpack: "**/*.node",
     electronFuses: {
         enableCookieEncryption: true,
@@ -116,7 +116,7 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
     linux: {
         target: ["tar.gz", "deb"],
         category: "Network;InstantMessaging;Chat",
-        maintainer: "support@element.io",
+        maintainer: "app.linux@elecord.app",
         icon: "build/icons",
     },
     deb: {
@@ -170,8 +170,8 @@ const config: Omit<Writable<Configuration>, "electronFuses"> & {
     },
     protocols: [
         {
-            name: "element",
-            schemes: ["io.element.desktop", "element"],
+            name: "elecord",
+            schemes: ["app.elecord.desktop", "elecord"],
         },
     ],
     nativeRebuilder: "sequential",
