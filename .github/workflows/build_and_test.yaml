@@ -28,18 +28,18 @@ jobs:
         with:
             arch: ${{ matrix.arch }}
 
-    linux:
-        needs: fetch
-        name: "Linux (${{ matrix.arch }}) (sqlcipher: ${{ matrix.sqlcipher }})"
-        uses: ./.github/workflows/build_linux.yaml
-        strategy:
-            matrix:
-                # sqlcipher: [system, static]
-                sqlcipher: [static]
-                arch: [amd64, arm64]
-        with:
-            sqlcipher: ${{ matrix.sqlcipher }}
-            arch: ${{ matrix.arch }}
+    # linux:
+    #     needs: fetch
+    #     name: "Linux (${{ matrix.arch }}) (sqlcipher: ${{ matrix.sqlcipher }})"
+    #     uses: ./.github/workflows/build_linux.yaml
+    #     strategy:
+    #         matrix:
+    #             # sqlcipher: [system, static]
+    #             sqlcipher: [static]
+    #             arch: [amd64, arm64]
+    #     with:
+    #         sqlcipher: ${{ matrix.sqlcipher }}
+    #         arch: ${{ matrix.arch }}
 
     # macos:
     #     needs: fetch
