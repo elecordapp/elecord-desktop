@@ -56,7 +56,8 @@ jobs:
                         "ia32": {
                           "target": "i686-pc-windows-msvc",
                           "build-args": "--ia32",
-                          "arch": "x86"
+                          "arch": "x86",
+                          "extra_config": "{\"user_notice\": {\"title\": \"Your desktop support ends soon\",\"description\": \"Support for 32-bit Windows installations will end soon, this impacts you. Transition to the web or mobile app for continued access.\"}}"
                         }
                       }
 
@@ -73,11 +74,6 @@ jobs:
                   key: ${{ runner.os }}-${{ inputs.arch }}-${{ hashFiles('hakHash', 'electronVersion') }}
                   path: |
                       ./.hak
-
-            - name: Set up build tools
-              uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
-              with:
-                  arch: ${{ steps.config.outputs.arch || inputs.arch }}
 
             # ActiveTCL package on choco is from 2015,
             # this one is newer but includes more than we need
@@ -104,12 +100,37 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version-file: package.json
+                  node-version-file: .node-version
                   cache: "yarn"
 
-            # Does not need branch matching as only analyses this layer
             - name: Install Deps
               run: "yarn install --frozen-lockfile"
+
+            - name: Insert config snippet
+              if: steps.config.outputs.extra_config != ''
+              shell: bash
+              run: |
+                  mkdir config-edit
+                  yarn asar extract webapp.asar config-edit
+                  cd config-edit
+                  mv config.json old-config.json
+                  echo '${{ steps.config.outputs.extra_config }}' | jq -s '.[0] * .[1]' old-config.json - > config.json
+                  rm old-config.json
+                  cd ..
+                  rm webapp.asar
+                  yarn asar pack config-edit/ webapp.asar
+
+            - name: Set up sqlcipher macros
+              if: steps.cache.outputs.cache-hit != 'true' && contains(inputs.arch, 'arm')
+              shell: pwsh
+              run: |
+                  echo "NCC=${{ github.workspace }}\scripts\cl.bat" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+            - name: Set up build tools
+              if: steps.cache.outputs.cache-hit != 'true'
+              uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+              with:
+                  arch: ${{ steps.config.outputs.arch || inputs.arch }}
 
             - name: Build Natives
               if: steps.cache.outputs.cache-hit != 'true'
@@ -160,24 +181,25 @@ jobs:
             #       INSTALL_DIR: C:\Users\runneradmin\eSignerCKA
             #       MASTER_KEY_FILE: C:\Users\runneradmin\eSignerCKA\master.key
 
-            - name: "[Nightly] Resolve version"
-              if: inputs.version != ''
-              shell: bash
-              run: |
-                  echo "ED_NIGHTLY=${{ inputs.version }}" >> $GITHUB_ENV
-
-            # XXX: For whatever reason if we use `yarn build ...` it freezes, but splitting it into parts it is fine
-            - run: yarn run build:ts
-            - run: yarn run build:res
-
             - name: Build App
-              run: |
-                  yarn electron-builder --publish never -w ${{ steps.config.outputs.build-args }}
+              run: yarn build --publish never -w ${{ steps.config.outputs.build-args }}
+              env:
+                  # Only set for Nightly builds
+                  ED_NIGHTLY: ${{ inputs.version }}
+
+            # - name: Trust eSigner sandbox cert
+            #   if: inputs.sign == ''
+            #   run: |
+            #       Set-StrictMode -Version 'Latest'
+            #       Import-Certificate -CertStoreLocation Cert:\LocalMachine\Root -FilePath .github/SSLcom-sandbox.crt
 
             # - name: Check app was signed successfully
-            #   if: inputs.sign
             #   run: |
-            #       . "$env:SIGNTOOL_PATH" verify /pa (get-item ./dist/squirrel-windows*/*.exe)
+            #       Set-StrictMode -Version 'Latest'
+            #       Get-ChildItem `
+            #           -Recurse dist `
+            #           -Include *.exe, *.msi `
+            #       | ForEach-Object -Process {. $env:SIGNTOOL_PATH verify /pa $_.FullName; if(!$?) { throw }}
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v4
@@ -186,3 +208,11 @@ jobs:
                   path: |
                       dist
                   retention-days: 1
+
+            - name: Assert all required files are present
+              run: |
+                  Test-Path './dist/win-*unpacked/elecord*.exe'
+                  Test-Path './dist/squirrel-windows*/elecord Setup*.exe'
+                  Test-Path './dist/squirrel-windows*/elecord-desktop-*-full.nupkg'
+                  Test-Path './dist/squirrel-windows*/RELEASES'
+                  Test-Path './dist/elecord*.msi'
