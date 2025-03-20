@@ -38,8 +38,13 @@ jobs:
             - name: Check existing redirects for current version
               # check if _redirects already contains any refferences to the current version
               run: |
-                  if grep -q ${{ env.VERSION }} ./root/_redirects; then
-                      echo "Redirects for ${{ env.VERSION }} already exist, skipping new redirects"
+                  VERSION="${{ env.VERSION }}"
+
+                  LINE1="/desktop/install/win32/x64/elecord%20Setup%20$VERSION.exe https://github.com/elecordapp/elecord-desktop/releases/download/v$VERSION/elecord.Setup.$VERSION.exe"
+                  LINE2="/desktop/update/win32/x64/elecord-desktop-$VERSION-full.nupkg https://github.com/elecordapp/elecord-desktop/releases/download/v$VERSION/elecord-desktop-$VERSION-full.nupkg"
+
+                  if grep -Fxq "$LINE1" ./root/_redirects || grep -Fxq "$LINE2" ./root/_redirects; then
+                      echo "Redirects for $VERSION already exist, skipping new redirects"
                       echo "SKIP_REDIRECTS=true" >> $GITHUB_ENV
                   fi
 
