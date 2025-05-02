@@ -59,5 +59,7 @@
     "force_verification": true,
     "embedded_pages": {
         "login_for_welcome": true
-    }
+    },
+    "uuid": "b1bb8629-f0ec-4500-b17d-ca230456701e",
+    "help_url": "https://elecord.app/"
 }
