@@ -3,7 +3,7 @@
     "productName": "elecord",
     "main": "lib/electron-main.js",
     "exports": "./lib/electron-main.js",
-    "version": "2.2.1",
+    "version": "2.3.0",
     "description": "Privacy focused chat app for gamers",
     "author": "elecord",
     "homepage": "https://elecord.app",
