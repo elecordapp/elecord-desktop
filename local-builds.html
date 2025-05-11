@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Local builds</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            max-width: 30em;
+            margin: 2em auto;
+            padding: 1em;
+            background-color: #222;
+            color: #eee;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+        }
+
+        a {
+            color: rgb(108, 180, 216);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ol {
+            padding-left: 2em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Local builds</h1>
+    <p>Create builds locally using development versions of elecord-web.</p>
+
+    <ol>
+        <li>Download a webapp.zip from a recent GitHub workflow run
+            <br><a
+                href="https://github.com/elecordapp/elecord-web/actions">github.com/elecordapp/elecord-web/actions</a>
+        </li>
+        <li>Extract elecord-vb3a70e6-js-a29b873.tar.gz to <code>./v1.2.3/</code></li>
+        <li>Rename tarball to also match <code>elecord-v1.2.3.tar.gz</code></li>
+        <li>Edit <code>PACKAGE_URL_PREFIX</code> in <code>./scripts/fetch-package.ts</code></li>
+        <li>Start a live preview server from this file in vscode
+            <br><a
+                href="https://open-vsx.org/extension/ms-vscode/live-server">open-vsx.org/extension/ms-vscode/live-server</a>
+        </li>
+    </ol>
+
+</body>
+
+</html>
+

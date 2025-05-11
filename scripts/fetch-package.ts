@@ -11,7 +11,11 @@ import riotDesktopPackageJson from "../package.json";
 import { setPackageVersion } from "./set-version.js";
 
 const PUB_KEY_URL = "https://packages.riot.im/element-release-key.asc";
+
 const PACKAGE_URL_PREFIX = "https://github.com/elecordapp/elecord-web/releases/download/";
+// const PACKAGE_URL_PREFIX = "http://127.0.0.1:3000/";
+// (postfix: v1.0.0/elecord-v1.0.0.tar.gz)
+
 const DEVELOP_TGZ_URL = "https://develop.element.io/develop.tar.gz";
 const ASAR_PATH = "webapp.asar";
 
