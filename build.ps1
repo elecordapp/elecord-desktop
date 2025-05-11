@@ -30,7 +30,6 @@ Confirm-And-Execute -CommandDescription "yarn install" -CommandBlock { yarn inst
 
 # step 2: yarn run fetch
 Confirm-And-Execute -CommandDescription 'yarn run fetch' -CommandBlock {
-    # yarn run fetch --noverify --cfgdir ".\element.io\release\"
     yarn run fetch --noverify --cfgdir ".\elecord.app\release\"
 }
 
