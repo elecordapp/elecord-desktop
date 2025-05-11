@@ -11,9 +11,9 @@ import { URL } from "node:url";
 import path from "node:path";
 import fs from "node:fs";
 
-const LEGACY_PROTOCOL = "element";
-const PROTOCOL = "io.element.desktop";
-const SEARCH_PARAM = "element-desktop-ssoid";
+const LEGACY_PROTOCOL = "elecord";
+const PROTOCOL = "app.elecord.desktop";
+const SEARCH_PARAM = "elecord-desktop-ssoid";
 const STORE_FILE_NAME = "sso-sessions.json";
 
 // we getPath userData before electron-main changes it, so this is the default value
