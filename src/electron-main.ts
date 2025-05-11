@@ -32,7 +32,7 @@ import { getProfileFromDeeplink, protocolInit } from "./protocol.js";
 import { _t, AppLocalization } from "./language-helper.js";
 import { setDisplayMediaCallback } from "./displayMediaCallback.js";
 import { setupMacosTitleBar } from "./macos-titlebar.js";
-import { loadJsonFile } from "./utils.js";
+import { type Json, loadJsonFile } from "./utils.js";
 import { setupMediaAuth } from "./media-auth.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -44,7 +44,12 @@ const argv = minimist(process.argv, {
 if (argv["help"]) {
     console.log("Options:");
     console.log("  --profile-dir {path}: Path to where to store the profile.");
-    console.log("  --profile {name}:     Name of alternate profile to use, allows for running multiple accounts.");
+    console.log(
+        `  --profile {name}:     Name of alternate profile to use, allows for running multiple accounts.\n` +
+            `                         Ignored if --profile-dir is specified.\n` +
+            `                         The ELEMENT_PROFILE_DIR environment variable may be used to change the default profile path.\n` +
+            `                         It is overridden by --profile-dir, but can be combined with --profile.`,
+    );
     console.log("  --devtools:           Install and use react-devtools and react-perf.");
     console.log(
         `  --config:             Path to the config.json file. May also be specified via the ELEMENT_DESKTOP_CONFIG_JSON environment variable.\n` +
@@ -58,6 +63,7 @@ if (argv["help"]) {
 }
 
 const LocalConfigLocation = process.env.ELEMENT_DESKTOP_CONFIG_JSON ?? argv["config"];
+const LocalConfigFilename = "config.json";
 
 // Electron creates the user data directory (with just an empty 'Dictionaries' directory...)
 // as soon as the app path is set, so pick a random path in it that must exist if it's a
@@ -75,7 +81,7 @@ if (userDataPathInProtocol) {
 } else if (argv["profile-dir"]) {
     userDataPath = argv["profile-dir"];
 } else {
-    let newUserDataPath = app.getPath("userData");
+    let newUserDataPath = process.env.ELEMENT_PROFILE_DIR ?? app.getPath("userData");
     if (argv["profile"]) {
         newUserDataPath += "-" + argv["profile"];
     }
@@ -136,6 +142,17 @@ function getAsarPath(): Promise<string> {
     return asarPathPromise;
 }
 
+function loadLocalConfigFile(): Json {
+    if (LocalConfigLocation) {
+        console.log("Loading local config: " + LocalConfigLocation);
+        return loadJsonFile(LocalConfigLocation);
+    } else {
+        const configDir = app.getPath("userData");
+        console.log(`Loading local config: ${path.join(configDir, LocalConfigFilename)}`);
+        return loadJsonFile(configDir, LocalConfigFilename);
+    }
+}
+
 // Loads the config from asar, and applies a config.json from userData atop if one exists
 // Writes config to `global.vectorConfig`. Does nothing if `global.vectorConfig` is already set.
 async function loadConfig(): Promise<void> {
@@ -144,7 +161,8 @@ async function loadConfig(): Promise<void> {
     const asarPath = await getAsarPath();
 
     try {
-        global.vectorConfig = loadJsonFile(asarPath, "config.json");
+        console.log(`Loading app config: ${path.join(asarPath, LocalConfigFilename)}`);
+        global.vectorConfig = loadJsonFile(asarPath, LocalConfigFilename);
     } catch {
         // it would be nice to check the error code here and bail if the config
         // is unparsable, but we get MODULE_NOT_FOUND in the case of a missing
@@ -155,9 +173,7 @@ async function loadConfig(): Promise<void> {
 
     try {
         // Load local config and use it to override values from the one baked with the build
-        const localConfig = LocalConfigLocation
-            ? loadJsonFile(LocalConfigLocation)
-            : loadJsonFile(app.getPath("userData"), "config.json");
+        const localConfig = loadLocalConfigFile();
 
         // If the local config has a homeserver defined, don't use the homeserver from the build
         // config. This is to avoid a problem where Riot thinks there are multiple homeservers
@@ -310,6 +326,11 @@ app.commandLine.appendSwitch("--enable-usermedia-screen-capturing");
 if (!app.commandLine.hasSwitch("enable-features")) {
     app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
 }
+// Workaround bug in electron 36:https://github.com/electron/electron/issues/46538
+// Hopefully this will no longer be needed soon and can be removed
+if (process.platform === "linux") {
+    app.commandLine.appendSwitch("gtk-version", "3");
+}
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -436,8 +457,9 @@ app.on("ready", async () => {
         });
     });
 
-    if (argv["no-update"]) {
-        console.log('Auto update disabled via command line flag "--no-update"');
+    // Minimist parses `--no-`-prefixed arguments as booleans with value `false` rather than verbatim.
+    if (argv["update"] === false) {
+        console.log("Auto update disabled via command line flag");
     } else if (global.vectorConfig["update_base_url"]) {
         console.log(`Starting auto update with base URL: ${global.vectorConfig["update_base_url"]}`);
         void updater.start(global.vectorConfig["update_base_url"]);
@@ -579,8 +601,9 @@ app.on("second-instance", (ev, commandLine, workingDirectory) => {
     }
 });
 
-// Set the App User Model ID to match what the squirrel
-// installer uses for the shortcut icon.
-// This makes notifications work on windows 8.1 (and is
-// a noop on other platforms).
-app.setAppUserModelId("com.squirrel.element-desktop.Element");
+// This is required to make notification handlers work
+// on Windows 8.1/10/11 (and is a noop on other platforms);
+// It must also match the ID found in 'electron-builder'
+// in order to get the title and icon to show up correctly.
+// Ref: https://stackoverflow.com/a/77314604/3525780
+app.setAppUserModelId("app.elecord.desktop");
