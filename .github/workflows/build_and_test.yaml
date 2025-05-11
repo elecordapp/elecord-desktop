@@ -14,8 +14,8 @@ jobs:
         permissions:
             contents: read
         with:
-            config: ${{ github.event.pull_request.base.ref == 'develop' && 'elecord.app/nightly' || 'elecord.app/release' }}
-            version: ${{ github.event.pull_request.base.ref == 'develop' && 'develop' || '' }}
+            config: ${{ (github.event.pull_request.base.ref || github.ref_name) == 'develop' && 'elecord.app/nightly' || 'elecord.app/release' }}
+            version: ${{ (github.event.pull_request.base.ref || github.ref_name) == 'develop' && 'develop' || '' }}
 
     windows:
         needs: fetch
@@ -23,7 +23,7 @@ jobs:
         uses: ./.github/workflows/build_windows.yaml
         strategy:
             matrix:
-                # arch: [x64, ia32, arm64]
+                # arch: [x64, arm64]
                 arch: [x64]
         with:
             arch: ${{ matrix.arch }}
@@ -41,13 +41,8 @@ jobs:
     #         sqlcipher: ${{ matrix.sqlcipher }}
     #         arch: ${{ matrix.arch }}
 
-    # macos:
-    #     needs: fetch
-    #     name: macOS
-    #     uses: ./.github/workflows/build_macos.yaml
-
     release:
-        # needs: [windows, linux, macos]
+        # needs: [windows, linux]
         needs: [windows]
         name: Create GitHub release
         uses: ./.github/workflows/build_release.yaml
